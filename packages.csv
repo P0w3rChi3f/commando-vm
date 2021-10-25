@@ -1,4 +1,4 @@
-Package Name,Description, Dependencies, Category, URL, How to install
+PackageName,Description, Dependencies, Category, URL, How to install
 010editor.flare,Professional hex editor with Binary Templates, , Hex Editor, https://www.sweetscape.com, cinst -y 010editor.flare
 7zip.flare,7-Zip is a free and open-source file archiver, , Hex Editor, https://www.7-zip.org/, cinst -y 7zip.flare
 AD-control-paths.fireeye,Control paths in Active Directory are an aggregation of control relations between entities of the domain which can be visualized as graphs (such as above) and whose purpose is to answer questions like Who can get Domain Admins privileges? or What resources can a user control? and even Who can read the CEOs emails?, , Vulnerability Analysis,https://github.com/ANSSI-FR/AD-control-paths, cinst -y AD-control-paths.fireeye

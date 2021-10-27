@@ -1,3 +1,7 @@
+## 2021.2 - October 27 2021
+
+- Added a script to download the needed files to do an offline install.
+
 ## 2021.2 - July 14 2021
 - Require users to disable Defender before installing
   * Too many issues arise from Defender magically turning itself back on. Disabling defender with the preconfig script has been unreliable since Win10 1909.

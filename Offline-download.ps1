@@ -1,5 +1,6 @@
 $apps = Import-Csv ./packages.csv
 $myDownloadList = @()
+$AppObject = [PSCustomObject]@{}
 
 New-Item -ItemType Directory -name Downloads -path . -Force
 Set-Location .\Downloads
@@ -31,7 +32,7 @@ foreach ($app in $apps) {
             $myApps = (((Invoke-WebRequest -uri https://community.chocolatey.org$APPhref).rawcontent).split(" ")).split(">") | Select-String -Pattern ".nupkg"
         }
 
-        Catch {}
+        Catch { }
 
         $AppObject = [PSCustomObject]@{
             AppName = $TrimmedApp
@@ -43,15 +44,23 @@ foreach ($app in $apps) {
             HowToInstall = "choco install $myapps -y"
              } # End Custom Object
         
+        
+        try {
+            Invoke-WebRequest -Uri $AppObject.DownloadURL -OutFile ./"$($AppObject.PackageName)"
+        }
+        catch { Write-host " Cannot find application on Chocolatey"
+                $AppObject.DownloadURL = "App Not Found"
+                $AppObject.HowToInstall = $null
+        }
+        
         $myDownloadList += $AppObject
-        Invoke-WebRequest -Uri $AppObject.DownloadURL -OutFile ./"$($AppObject.PackageName)"
     }   
 
 
 } # End ForEach
 
 set-location ..
-$myDownloadList | export-csv ../myDownloadList.csv -Force
+$myDownloadList | export-csv ./myDownloadList.csv -Force
 
 <# Links below are just for reference  
 

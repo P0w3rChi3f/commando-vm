@@ -75,53 +75,59 @@ Function Get-FireEyeApps {
     foreach ($app in $apps) {
 
         $TrimmedApp = [System.IO.Path]::GetFileNameWithoutExtension((($app)."PackageName"))
-        if ($app.url -like "https://github.com*") {
-            Write-host "$trimmedApp is on GitHub "
-            $AppObject = [PSCustomObject]@{
-                AppName = $TrimmedApp
-                PackageName = "$trimmedApp.git"
-                Description = $app.Description
-                Category = $app.Category
-                AppUrl = $app.URL
-                DownloadURL = "$($app.url).git"
-                HowToInstall = "git clone $($app.url).git"
-                } # End Custom Object
-            
-            $myDownloadList += $AppObject
-            #Test to see if it exists
-            git clone $AppObject.DownloadURL
+        if ((Test-Path .\$trimmedApp)-or (Test-Path ".\$TrimmedApp.*.nupkg")) {
+            Write-host "$TrimmedApp already downloaded, coninuing on"
         }
-        Else {
-            write-host "Searching on Chocolatey for $trimmedApp"
-
-            $APPhref = (Invoke-WebRequest  -Uri https://community.chocolatey.org/packages?q=$TrimmedApp).links.href | Where-Object {$_ -like "*$trimmedApp" -and $_ -notlike "*?q=tag%3A*"} | Select-Object -first 1
-            try {
-                $myApps = (((Invoke-WebRequest -uri https://community.chocolatey.org$APPhref).rawcontent).split(" ")).split(">") | Select-String -Pattern ".nupkg"
+        else {
+            Write-host "Downloading $TrimmedApp now"
+            if ($app.url -like "https://github.com*") {
+                Write-host "$trimmedApp is on GitHub "
+                $AppObject = [PSCustomObject]@{
+                    AppName = $TrimmedApp
+                    PackageName = "$trimmedApp.git"
+                    Description = $app.Description
+                    Category = $app.Category
+                    AppUrl = $app.URL
+                    DownloadURL = "$($app.url).git"
+                    HowToInstall = "git clone $($app.url).git"
+                    } # End Custom Object
+                
+                $myDownloadList += $AppObject
+                #Test to see if it exists
+                git clone $AppObject.DownloadURL
             }
+            Else {
+                write-host "Searching on Chocolatey for $trimmedApp"
 
-            Catch { }
+                $APPhref = (Invoke-WebRequest  -Uri https://community.chocolatey.org/packages?q=$TrimmedApp).links.href | Where-Object {$_ -like "*$trimmedApp" -and $_ -notlike "*?q=tag%3A*"} | Select-Object -first 1
+                try {
+                    $myApps = (((Invoke-WebRequest -uri https://community.chocolatey.org$APPhref).rawcontent).split(" ")).split(">") | Select-String -Pattern ".nupkg"
+                }
 
-            $AppObject = [PSCustomObject]@{
-                AppName = $TrimmedApp
-                PackageName = $myApps
-                Description = $app.Description
-                Category = $app.Category
-                AppUrl = $app.URL
-                DownloadURL = "https://packages.chocolatey.org/$myapps"
-                HowToInstall = "choco install $myapps -y"
-                } # End Custom Object
-            
-            
-            try {
-                Invoke-WebRequest -Uri $AppObject.DownloadURL -OutFile ./"$($AppObject.PackageName)"
-            }
-            catch { Write-host " Cannot find application on Chocolatey"
-                    $AppObject.DownloadURL = "App Not Found"
-                    $AppObject.HowToInstall = $null
-            }
-            
-            $myDownloadList += $AppObject
-        }   
+                Catch { }
+
+                $AppObject = [PSCustomObject]@{
+                    AppName = $TrimmedApp
+                    PackageName = $myApps
+                    Description = $app.Description
+                    Category = $app.Category
+                    AppUrl = $app.URL
+                    DownloadURL = "https://packages.chocolatey.org/$myapps"
+                    HowToInstall = "choco install $myapps -y"
+                    } # End Custom Object
+                
+                
+                try {
+                    Invoke-WebRequest -Uri $AppObject.DownloadURL -OutFile ./"$($AppObject.PackageName)"
+                }
+                catch { Write-host " Cannot find application on Chocolatey"
+                        $AppObject.DownloadURL = "App Not Found"
+                        $AppObject.HowToInstall = $null
+                }
+                
+                $myDownloadList += $AppObject
+            } 
+        } #end Test-path  
 
     } # End ForEach
 
@@ -137,8 +143,7 @@ Get-FireEyeApps
 
 <# TO DO List:
 
-1) Create a test to check for already downloaded apps
-2) Created template creates 2 headders
+1) Created template creates 2 headders
 
 
 

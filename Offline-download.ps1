@@ -144,6 +144,7 @@ Get-FireEyeApps
 <# TO DO List:
 
 1) Created template creates 2 headders
+2) Check to see if there is internet connection
 
 
 

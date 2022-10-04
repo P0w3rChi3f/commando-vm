@@ -43,7 +43,6 @@ Function Get-FireEyeApps {
     $myDownloadList = @()
     $AppObject = [PSCustomObject]@{}
 
-
     if (!(Test-Path $csvPath)) {Write-host "File does not exist!"; break}
 
     try{
